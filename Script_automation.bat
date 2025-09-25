@@ -4,7 +4,7 @@ cls
 echo ====================================================================================================
 echo         Welcome user!
 echo         Script for configuring the system in Windows 10 and 11;
-echo         Versao 2.1 - Matheus Marcelo
+echo         Versao 3.0 - Matheus Marcelo
 echo ====================================================================================================
 echo.
 echo Choose your desired option:
@@ -41,7 +41,6 @@ goto menu
 :parte1
 echo Executando a Parte 1...
 @echo off
-
 @echo ====================================================================================================
 @echo         Este script vai alterar o endereco TCP/IP para: 192.168.0.163, gateway: 192.168.0.1
 @echo         E DNS preferencial para 192.168.0.1, e reiniciar o serviço LANMAN
@@ -60,8 +59,6 @@ goto menu
 :parte2
 echo Executando a Parte 2...
 @echo off
-
-REM Copiar a pasta de assets para o disco Local
 set "source=%USERPROFILE%\Desktop\assets"
 set "destination=C:\"
 
@@ -70,7 +67,6 @@ if not exist "%source%" (
     pause
     exit /b
 )
-
 if not exist "%destination%" (
     echo O diretório de destino não existe.
     pause
@@ -84,35 +80,23 @@ if %errorlevel% equ 0 (
 ) else (
     echo Houve um erro ao copiar a pasta.
 )
-
-REM Desabilitar envio de dados para melhorias (Microsoft)
-REM exceto serviços SMB, FTP, RemoteControl....
 sc config DiagTrack start= disabled
 sc config diagnosticshub.standardcollector.service start= disabled
 sc config dmwappushservice start= disabled
 sc config iphlpsvc start= disabled
 sc config DoSvc start= disabled
 sc config DPS start= disabled
-
-REM Desabilitar serviço de VPN como SSTP, IPsec e RasMan
 sc config SstpSvc start= disabled
 sc config IKEEXT start= disabled
-
-REM Desabilitar atualizações de aplicativos da Microsoft Store
 sc config WMPNetworkSvc start= disabled
 sc config wisvc start= disabled
 sc config RasMan start= disabled
-
-REM Desabilitar outros serviços que podem influenciar no desempenho do S.O
 sc config VSS start= disabled 
 sc config RemoteAccess start= disabled
 sc config SharedRealitySvc start= disabled
 sc config PhoneSvc start= disabled
 sc config perceptionsimulation start= disabled
 echo Serviços não essenciais desabilitados com sucesso!
-
-
-REM Desabilitar tarefas agendadas do Windows (coleta de dados)
 schtasks /Change /TN "Microsoft\Windows\Customer Experience Improvement Program\Consolidator" /Disable
 schtasks /Change /TN "Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" /Disable
 schtasks /Change /TN "Microsoft\Office\Office Automatic Updates 2.0" /Disable
@@ -127,64 +111,37 @@ schtasks /Change /TN "Microsoft\Windows\NetTrace\GatherNetworkInfo" /Disable
 schtasks /Change /TN "Microsoft\Windows\PI\Sqm-Tasks" /Disable
 schtasks /Change /TN "Microsoft\Windows\Windows Error Reporting\QueueReporting" /Disable
 echo Tarefas agendadas não essenciais, desabilitados com sucesso!
-
-REM ALTO IMPACTO NA FUNCIONALIDADE DO SISTEMA (DESEMPENHO):
-REM *** Desabilitar Aplicativos em Segundo Plano ***
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsRunInBackground" /t REG_DWORD /d 2 /f
 reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /V "LetAppsRunInBackground_UserInControlOfTheseApps" /F
 reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /V "LetAppsRunInBackground_ForceAllowTheseApps" /F
 reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /V "LetAppsRunInBackground_ForceDenyTheseApps" /F
-REM ***Aumentar velocidade dos menus***
 reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v "MenuShowDelay" /t REG_SZ /d 5 /f
-REM BAIXO IMPACTO DE DESEMPENHO NO SISTEMA (Intuito de simplesmente desativar o que o usuário não precisa):
-REM *** Remover botão busca da barra de tarefas ***
 REG ADD "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search" /v SearchboxTaskbarMode /d 0 /t REG_DWORD /f
-REM *** Desabilitar Localização ***
 reg add /f "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" /v "Value" /t REG_SZ /d Deny /f
-REM *** Desabilitar Mobile Hotspot ***
 REG ADD "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Network Connections" /v NC_ShowSharedAccessUI /d 0 /t REG_DWORD /f
-REM *** Desabilitar dicionário pessoal ***
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\CPSS\Store\InkingAndTypingPersonalization" /v Value /t REG_DWORD /d 0 /f
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Personalization\Settings" /v AcceptedPrivacyPolicy /t REG_DWORD /d 0 /f
 reg add "HKEY_CURRENT_USER\Software\Microsoft\InputPersonalization" /v RestrictImplicitInkCollection /t REG_DWORD /d 1 /f
 reg add "HKEY_CURRENT_USER\Software\Microsoft\InputPersonalization" /v RestrictImplicitTextCollection /t REG_DWORD /d 1 /f
 reg add "HKEY_CURRENT_USER\Software\Microsoft\InputPersonalization\TrainedDataStore" /v HarvestContacts /t REG_DWORD /d 0 /f
-REM ***Desabilitar envio de escrita a Microsoft*
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\TextInput" /V "AllowLinguisticDataCollection" /T REG_DWORD /D 0 /F
-REM ***Desabilitar Experiencias Personalizadas***
 reg add "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\CloudContent" /v "DisableTailoredExperiencesWithDiagnosticData" /t REG_DWORD /d 1 /f
-REM ***Desabilitar reconhecimento de voz online***
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\InputPersonalization" /v "AllowInputPersonalization" /t REG_DWORD /d 0 /f
-REM Ativação por voz desativada acima da tela de bloqueio:
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v NoLockScreenVoiceActivation /t REG_DWORD /d 1 /f
-REM Desativa sugestão de conteúdo:
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SystemPaneSuggestionsEnabled /t REG_DWORD /d 0 /f
-
-
-REM CONFIGURAÇÕES UNIVERSAIS - WINDOWS 10 E 11{}
-REM Desativa a hibernação
 powercfg.exe /hibernate off
-
-REM CONFIGURAÇÕES DE ENERGIA
-REM Definir proteção de tela com Texto 3D:
 reg add "HKCU\Control Panel\Desktop" /v ScreenSaveActive /t REG_SZ /d 1 /f
 reg add "HKCU\Control Panel\Desktop" /v ScreenSaverIsSecure /t REG_SZ /d 0 /f
 reg add "HKCU\Control Panel\Desktop" /v ScreenSaveTimeOut /t REG_SZ /d 600 /f
 reg add "HKCU\Control Panel\Desktop" /v SCRNSAVE.EXE /t REG_SZ /d "%SystemRoot%\System32\ssText3d.scr" /f
-REM Tempo de bloqueio da tela de 10 minutos:
 reg add "HKCU\Control Panel\Desktop" /v ScreenSaveTimeOut /t REG_SZ /d 600 /f
-REM Define o plano de energia ativo como "Equilibrado"
 powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e
-REM Define as opções de energia para desligar o vídeo e suspender atividade como "Nunca"
 powercfg /change monitor-timeout-ac 0
 powercfg /change monitor-timeout-dc 0
 powercfg /change standby-timeout-ac 0
 powercfg /change standby-timeout-dc 0
-REM Atualiza as configurações de energia
 powercfg /S 381b4222-f694-41f0-9685-ff5bb260df2e
 echo As opções de energia foram configuradas com sucesso!
-
-REM Remover as configurações de ações rápidas do painel de controle do usuário atual, aguardar 5s e reinicia o explorer
 TIMEOUT /T 5
 taskkill /f /im explorer.exe
 start explorer.exe
@@ -197,8 +154,6 @@ goto menu
 :parte5
 echo Executando a Parte 5...
  
-REM ***Instalar o Chocolatey***
-REM Verificar se o Chocolatey já está instalado
 choco -v >nul 2>&1
 if %errorlevel% neq 0 (
     REM Instala o Chocolatey
@@ -232,8 +187,6 @@ choco install jre8 --yes
 choco install wps-office-free --version=11.2.0.9684 --yes
 choco install office2019proplus --yes
 
-
-
 echo Google Chrome, Firefox, Adobe, Winrar e Java instalados com sucesso!
 REM ***Desinstalar o Chocolatey***
 choco uninstall chocolatey --yes
@@ -243,8 +196,6 @@ REG ADD HKCU\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\http\
 REG ADD HKCU\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice /v ProgId /d ChromeHTML /f
 REM ***Definir Adobe Reader como leitor de PDF padrão***
 REG ADD HKCU\SOFTWARE\Microsoft\Windows\Shell\Associations\MIMEAssociations\application/pdf\UserChoice /v ProgId /d AcroExch.Document.DC /f
-
-
 REM *** Instalar .NET Framework 3.5 ***
 Dism /online /norestart /Enable-Feature /FeatureName:"NetFx3"
 
@@ -255,8 +206,6 @@ goto menu
 
 :parte4
 echo Executando a Parte 4...
-REM DEFINIR PAPEL DE PAREDE DE ACORDO COM O DEPARTAMENTO:
-
 REM CONFIGURAÇÕES DE NOME DE USUARIO
 set /p newComputerName=Digite o novo nome do computador e do disco C: 
 REM Remover as aspas do nome
@@ -286,7 +235,6 @@ if "%choice%"=="1" (
     echo URL=file://192.168.0.247/tes_dpas >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
     echo IconFile=C:\assets\icon_Pref.ico >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
     echo IconIndex=0 >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
-
     REM ICONE DO SISTEMA DE CHAMADOS	
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo URL=http://192.168.0.98:3000 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
@@ -294,15 +242,12 @@ if "%choice%"=="1" (
     echo IconIndex=0 >> "%USERPROFILE%\Desktop\Chamados_TI.url
   
 ) else if "%choice%"=="2" (
-    set "imageFile=educacao.jpg"
-    
-        
+    set "imageFile=educacao.jpg"  
     REM ICONE DO SRV SMB	
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
     echo URL=file://192.168.0.247/tes_deduc >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
     echo IconFile=C:\assets\icon_Pref.ico >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
     echo IconIndex=0 >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
-
     REM ICONE DO SISTEMA DE CHAMADOS	
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo URL=http://192.168.0.98:3000 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
@@ -318,13 +263,11 @@ if "%choice%"=="1" (
     echo URL=file://192.168.0.247/tes_desau >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
     echo IconFile=C:\assets\icon_Pref.ico >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
     echo IconIndex=0 >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
-
     REM ICONE DO PEC
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\PEC.url"
     echo URL=http://192.168.0.242:8080/ >> "%USERPROFILE%\Desktop\PEC.url"
     echo IconFile=%imageFolder%\icon_PEC.ico >> "%USERPROFILE%\Desktop\PEC.url
     echo IconIndex=0 >> "%USERPROFILE%\Desktop\PEC.url"
-    
     REM ICONE DO SISTEMA DE CHAMADOS	
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo URL=http://192.168.0.98:3000 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
@@ -339,7 +282,6 @@ if "%choice%"=="1" (
     echo URL=file://192.168.0.247/ >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
     echo IconFile=C:\assets\icon_Pref.ico >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
     echo IconIndex=0 >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
-    
     REM ICONE DO SISTEMA DE CHAMADOS	
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo URL=http://192.168.0.98:3000 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
@@ -354,7 +296,6 @@ if "%choice%"=="1" (
     echo URL=file://192.168.0.247/ >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
     echo IconFile=C:\assets\icon_Pref.ico >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
     echo IconIndex=0 >> "%USERPROFILE%\Desktop\Prefeitura_Cloud.url"
-    
     REM ICONE DO SISTEMA DE CHAMADOS	
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo URL=http://192.168.0.98:3000 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
@@ -365,7 +306,6 @@ if "%choice%"=="1" (
     echo Opção inválida.
     exit /b
 )
-
 
 REM ICONE Do Email
 echo [InternetShortcut] > "%USERPROFILE%\Desktop\Webmail.url"
@@ -403,8 +343,6 @@ choco install notepadplusplus--yes
 choco install vscode --yes
 choco install nodejs --yes
 
-
-
 REM ***Desinstalar o Chocolatey***
 choco uninstall chocolatey --yes
 echo Chocolatey desinstalado com sucesso
@@ -415,14 +353,12 @@ goto menu
 :parte9
 echo Executando a Parte 9...
 @ECHO OFF
-
 @echo ============================================================================
 @echo    Script de limpeza de arquivos temporarios em todos usuarios do Windows.
 @echo    E função de desabilitar o WindowsUpdate e AdobeReader
 @echo ============================================================================
 pause
 
-REM desativa os serviços do adobe Reader e do WIndows Update
 net stop wuauserv
 sc config wuauserv start= disabled
 net stop AdobeARMservice
@@ -534,7 +470,6 @@ if exist "%profiles%\%%u\AppData\Local\Opera Software\Opera Next\Cache" cd "%pro
 if exist "%profiles%\%%u\AppData\Local\Opera Software\Opera Next\Caches" del *.* /F /S /Q /A: R /A: H /A: A
 if exist "%profiles%\%%u\AppData\Local\Opera Software\Opera Next\Cache" rmdir /s /q "%profiles%\%%u\AppData\Local\Opera Software\Opera Next\Cache"
 
-
 cls
 title Deletando %%u VIVALDI TEMP. . .
 if exist "%profiles%\%%u\AppData\Local\Vivaldi\User Data\Default\Cache" echo Deletando....
@@ -543,7 +478,6 @@ if exist "%profiles%\%%u\AppData\Local\Vivaldi\User Data\Default\Cache" del *.* 
 if exist "%profiles%\%%u\AppData\Local\Vivaldi\User Data\Default\Cache" rmdir /s /q "%profiles%\%%u\AppData\Local\Vivaldi\User Data\Default\Cache"
 
 )
-
 cls
 pause
 goto menu
@@ -560,10 +494,7 @@ echo Executando a Parte 3...
 @echo ============================================================================
 pause
 
-:: Habilitar a execução de scripts PowerShell
 powershell -Command "Set-ExecutionPolicy RemoteSigned -Scope Process"
-
-:: Remover o pacote específico
 powershell -Command "Get-AppxPackage -allusers Microsoft.549981C3F5F10 | Remove-AppxPackage"
 powershell -Command "Get-AppxPackage -allusers *Microsoft.549981C3F5F10* | Remove-AppxPackage"
 powershell -Command "Get-AppxPackage Microsoft.BingWeather | Remove-AppxPackage"
@@ -584,7 +515,6 @@ powershell -Command "Get-AppxPackage Microsoft.549981C3F5F10 | Remove-AppxPackag
 powershell -Command "Get-AppxPackage Microsoft.OneDrive | Remove-AppxPackage"
 powershell -Command "Get-AppxPackage MicrosoftTeams | Remove-AppxPackage"
 
-:: Definir a lista de aplicativos a serem desinstalados
 set appsToUninstall=(
     "Microsoft.3DBuilder",
     "Microsoft.BingWeather",
@@ -611,7 +541,6 @@ set appsToUninstall=(
     "Microsoft.YourPhone"
 )
 
-:: Iterar sobre a lista e desinstalar os aplicativos
 for %%a in %appsToUninstall% do (
     powershell -Command "Get-AppxPackage -Name %%a -AllUsers | Remove-AppxPackage"
     powershell -Command "Get-AppxProvisionedPackage -Online | Where-Object DisplayName -eq '%%a' | Remove-AppxProvisionedPackage -Online"
@@ -624,7 +553,6 @@ goto menu
 :parte7
 echo Executando a Parte 7...
 @echo off
-
 @echo ============================================================================
 @echo    Script de instalação de softwares básicos clientes
 @echo ============================================================================
@@ -634,17 +562,13 @@ choco install winrar --yes
 choco install wps-office-free --version=11.2.0.9684 --yes
 choco install brave --yes
 
-REM ***Desinstalar o Chocolatey***
 choco uninstall chocolatey --yes
 echo Chocolatey desinstalado com sucesso
 pause
 goto menu
 
-
-
 :END
 exit
-
 
 :sair
 echo Exiting the program...
