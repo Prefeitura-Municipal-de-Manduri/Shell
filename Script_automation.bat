@@ -8,16 +8,15 @@ echo         Versao 3.0 - Matheus Marcelo
 echo ====================================================================================================
 echo.
 echo Choose your desired option:
-echo 1. Parte 1 (Configuracao do IP para teste - 192.168.0.163)
-echo 2. Parte 2 (Otimizacao do sistema)
-echo 3. Parte 3 (Remover Softwares de fabrica - lite mode)
-echo 4. Parte 4 (Definir departamento e criar atalhos)
-echo 5. Parte 5 (Instalacao do Chocolatey)
-echo 6. Parte 6 (Instalacao dos softwares  Winrar, Chrome, Firefox, Office, WPS, Java, etc...)
-echo 7. Parte 7 (Instalacao dos softwares basicos - Winrar, Brave, e WPS)
-echo 8. Parte 8 (Softwares basicos | DEV/TI | Git, VSCode, NotepadPlus, NodeJS, etc.)
-echo 9. Parte 9 (Finalizar todo servicos de instalacao e atualizacao)
-
+echo 1. Parte 1 (IP configuration for testing - 192.168.0.163)
+echo 2. Parte 2 (System optimization)
+echo 3. Parte 3 (Remove factory software - lite mode)
+echo 4. Parte 4 (Set department and create shortcuts)
+echo 5. Parte 5 (Chocolatey installation)
+echo 6. Parte 6 (Software installation - WinRAR, Chrome, Firefox, Office, WPS, Java, etc.)
+echo 7. Parte 7 (Basic software installation - WinRAR, Brave, and WPS)
+echo 8. Parte 8 (Basic software | DEV/IT | Git, VSCode, Notepad++, NodeJS, etc.)
+echo 9. Parte 9 (Finish all installation and update services)
 echo 0. Sair
 echo.
 
@@ -490,7 +489,7 @@ echo Executando a Parte 3...
 @ECHO OFF
 
 @echo ============================================================================
-@echo    Script de remoção softwares de fábrica.
+@echo    Script de remocao softwares de fabrica.
 @echo ============================================================================
 pause
 
