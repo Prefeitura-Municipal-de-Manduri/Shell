@@ -2,7 +2,7 @@
 :menu
 cls
 echo ====================================================================================================
-echo         Welcome user!
+echo         Welcome user!!!
 echo         Script for configuring the system in Windows 10 and 11;
 echo         Versao 3.0 - Matheus Marcelo
 echo ====================================================================================================
