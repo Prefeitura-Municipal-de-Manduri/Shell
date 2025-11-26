@@ -17,7 +17,7 @@ wsl --install
 echo Listando distribuições disponíveis...
 wsl --list --online
 
-echo =====================================================
-echo Concluído. Reinicie o computador para finalizar a instalação.
-echo =====================================================
+echo =================================================================
+echo Concluído! Reinicie o computador para finalizar a instalação.
+echo =================================================================
 pause
