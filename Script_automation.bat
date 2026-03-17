@@ -1,21 +1,30 @@
 @echo off
+setlocal enabledelayedexpansion
+
+net session >nul 2>&1
+if not %errorlevel%==0 (
+    echo Este script precisa ser executado como administrador!
+    pause
+    exit
+)
+
 :menu
 cls
 echo ====================================================================================================
 echo         Welcome user!!!
 echo         Script for configuring the system in Windows 10 and 11;
-echo         Versao 3.0 - Matheus Marcelo
+echo         Versao 3.1 - @MatheusMarcelo1
 echo ====================================================================================================
 echo.
 echo Choose your desired option:
-echo 1. Parte 1 (IP configuration for testing - 192.168.0.163)
+echo 1. Parte 1 (IP configuration)
 echo 2. Parte 2 (System optimization)
 echo 3. Parte 3 (Remove factory software - lite mode)
 echo 4. Parte 4 (Set department and create shortcuts)
 echo 5. Parte 5 (Chocolatey installation)
 echo 6. Parte 6 (Software installation - WinRAR, Chrome, Firefox, Office, WPS, Java, etc.)
 echo 7. Parte 7 (Basic software installation - WinRAR, Brave, and WPS)
-echo 8. Parte 8 (Basic software | DEV/IT | Git, VSCode, Notepad++, NodeJS, etc.)
+echo 8. Parte 8 (Basic software - IT Git, VSCode, Notepad++, NodeJS, etc.)
 echo 9. Parte 9 (Finish all installation and update services)
 echo 0. Sair
 echo.
@@ -39,20 +48,15 @@ goto menu
 
 :parte1
 echo Executando a Parte 1...
-@echo off
-@echo ====================================================================================================
-@echo         Este script vai alterar o endereco TCP/IP para: 192.168.0.163, gateway: 192.168.0.1
-@echo         E DNS preferencial para 192.168.0.1, e reiniciar o serviço LANMAN
-@echo ====================================================================================================
-pause
-REM alterar ip
-netsh interface ipv4 set address name="Ethernet" static 192.168.0.163 255.255.255.0 192.168.0.1
+set /p novoIP=Digite o IP que deseja configurar para a placa Ethernet: 
+set /p gateway=Digite o Gateway: 
+netsh interface ipv4 set address name="Ethernet" static %novoIP% 255.255.255.0 %gateway%
 netsh interface ipv4 set dns name="Ethernet" static 192.168.0.1
-rem reiniciar serviço de rede LAN
 net stop LanmanWorkstation
 net start LanmanWorkstation
-msg %username% Configuracoes de Rede Concluidas com Sucesso!
-goto menu 
+msg %username% Configurações de Rede Concluídas com Sucesso!
+
+goto menu
 
 
 :parte2
@@ -155,7 +159,6 @@ echo Executando a Parte 5...
  
 choco -v >nul 2>&1
 if %errorlevel% neq 0 (
-    REM Instala o Chocolatey
     powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
 )
 msg %username% Chocolatey Instalado com Sucesso.
@@ -163,41 +166,18 @@ goto menu
 
 :parte6
 echo Executando a Parte 6...
-@echo off
-rem Coloque o código da Parte 2 aqui
-REM INSTALACAO DOS SOFTWARES
-REM ***Instalar Frameworks***
-rem choco install dotnetcore-desktop-runtime --yes
-rem choco install dotnet5 --yes
-rem choco install dotnet6 --yes
-REM ***Instalar Drivers***
-rem choco install intel-chipset-device-software --yes
-rem choco install intel-graphics-driver --yes
-rem choco install intel-rst-driver --yes
-rem choco install nvidia-display-driver --yes
-rem choco install realtek-audio-driver --yes
-rem choco install amd-ryzen-master --yes
-REM ***Instalar Navegadores e Programas para Internet***
 choco install googlechrome --yes
 choco install firefox --yes
 choco install adobereader --yes
 choco install winrar --yes
 choco install jre8 --yes
-choco install wps-office-free --version=11.2.0.9684 --yes
 choco install office2019proplus --yes
 
 echo Google Chrome, Firefox, Adobe, Winrar e Java instalados com sucesso!
-REM ***Desinstalar o Chocolatey***
-choco uninstall chocolatey --yes
-echo Chocolatey desinstalado com sucesso!
-REM ***Definir Chrome como navegador web padrão***
 REG ADD HKCU\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice /v ProgId /d ChromeHTML /f
 REG ADD HKCU\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice /v ProgId /d ChromeHTML /f
-REM ***Definir Adobe Reader como leitor de PDF padrão***
 REG ADD HKCU\SOFTWARE\Microsoft\Windows\Shell\Associations\MIMEAssociations\application/pdf\UserChoice /v ProgId /d AcroExch.Document.DC /f
-REM *** Instalar .NET Framework 3.5 ***
 Dism /online /norestart /Enable-Feature /FeatureName:"NetFx3"
-
 
 msg %username% Softwares Instalados com Sucesso!
 goto menu
@@ -205,13 +185,9 @@ goto menu
 
 :parte4
 echo Executando a Parte 4...
-REM CONFIGURAÇÕES DE NOME DE USUARIO
 set /p newComputerName=Digite o novo nome do computador e do disco C: 
-REM Remover as aspas do nome
 set newComputerName=%newComputerName:"=%
-REM Renomear o computador
 wmic computersystem where name="%computername%" call rename name="%newComputerName%"
-REM Renomear o rótulo do disco C:
 label C: %newComputerName%
 echo Nomes alterados com sucesso!
 
@@ -238,7 +214,7 @@ if "%choice%"=="1" (
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo URL=http://192.168.0.98:3000 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo IconFile=C:\assets\chamadoTI.ico >> "%USERPROFILE%\Desktop\Chamados_TI.url"
-    echo IconIndex=0 >> "%USERPROFILE%\Desktop\Chamados_TI.url
+    echo IconIndex=0 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
   
 ) else if "%choice%"=="2" (
     set "imageFile=educacao.jpg"  
@@ -251,7 +227,7 @@ if "%choice%"=="1" (
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo URL=http://192.168.0.98:3000 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo IconFile=C:\assets\chamadoTI.ico >> "%USERPROFILE%\Desktop\Chamados_TI.url"
-    echo IconIndex=0 >> "%USERPROFILE%\Desktop\Chamados_TI.url
+    echo IconIndex=0 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
 
 
 ) else if "%choice%"=="3" (
@@ -265,13 +241,13 @@ if "%choice%"=="1" (
     REM ICONE DO PEC
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\PEC.url"
     echo URL=http://192.168.0.242:8080/ >> "%USERPROFILE%\Desktop\PEC.url"
-    echo IconFile=%imageFolder%\icon_PEC.ico >> "%USERPROFILE%\Desktop\PEC.url
+    echo IconFile=%imageFolder%\icon_PEC.ico >> "%USERPROFILE%\Desktop\PEC.url"
     echo IconIndex=0 >> "%USERPROFILE%\Desktop\PEC.url"
     REM ICONE DO SISTEMA DE CHAMADOS	
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo URL=http://192.168.0.98:3000 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo IconFile=C:\assets\chamadoTI.ico >> "%USERPROFILE%\Desktop\Chamados_TI.url"
-    echo IconIndex=0 >> "%USERPROFILE%\Desktop\Chamados_TI.url
+    echo IconIndex=0 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
     
 ) else if "%choice%"=="4" (
     set "imageFile=geral.jpg"
@@ -285,7 +261,7 @@ if "%choice%"=="1" (
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo URL=http://192.168.0.98:3000 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo IconFile=C:\assets\chamadoTI.ico >> "%USERPROFILE%\Desktop\Chamados_TI.url"
-    echo IconIndex=0 >> "%USERPROFILE%\Desktop\Chamados_TI.url
+    echo IconIndex=0 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
 
 ) else if "%choice%"=="5" (
     set "imageFile=cras.jpg"
@@ -299,7 +275,7 @@ if "%choice%"=="1" (
     echo [InternetShortcut] > "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo URL=http://192.168.0.98:3000 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
     echo IconFile=C:\assets\chamadoTI.ico >> "%USERPROFILE%\Desktop\Chamados_TI.url"
-    echo IconIndex=0 >> "%USERPROFILE%\Desktop\Chamados_TI.url
+    echo IconIndex=0 >> "%USERPROFILE%\Desktop\Chamados_TI.url"
 
 ) else (
     echo Opção inválida.
@@ -310,7 +286,7 @@ REM ICONE Do Email
 echo [InternetShortcut] > "%USERPROFILE%\Desktop\Webmail.url"
 echo URL=https://webmail.manduri.sp.gov.br/ >> "%USERPROFILE%\Desktop\Webmail.url"
 echo IconFile=C:\assets\Webmail.ico >> "%USERPROFILE%\Desktop\Webmail.url"
-echo IconIndex=0 >> "%USERPROFILE%\Desktop\Webmail.url
+echo IconIndex=0 >> "%USERPROFILE%\Desktop\Webmail.url"
 
 rem Define a imagem como papel de parede usando o Windows Script Host (WSH)
 echo Set oShell = CreateObject^("WScript.Shell"^) > SetWallpaper.vbs
@@ -327,10 +303,9 @@ goto menu
 
 :parte8
 echo Executando a Parte 8...
-@echo off
 
 @echo ============================================================================
-@echo    Script de instalação de softwares básicos DEV/TI
+@echo    Script de instalação de softwares básicos TI
 @echo ============================================================================
 pause
 
@@ -338,20 +313,15 @@ choco install winrar --yes
 choco install wps-office-free --version=11.2.0.9684 --yes
 choco install brave --yes
 choco install git --yes
-choco install notepadplusplus--yes
+choco install notepadplusplus --yes
 choco install vscode --yes
 choco install nodejs --yes
-
-REM ***Desinstalar o Chocolatey***
-choco uninstall chocolatey --yes
-echo Chocolatey desinstalado com sucesso
 pause
 goto menu
 
 
 :parte9
 echo Executando a Parte 9...
-@ECHO OFF
 @echo ============================================================================
 @echo    Script de limpeza de arquivos temporarios em todos usuarios do Windows.
 @echo    E função de desabilitar o WindowsUpdate e AdobeReader
@@ -486,7 +456,6 @@ goto menu
 
 :parte3
 echo Executando a Parte 3...
-@ECHO OFF
 
 @echo ============================================================================
 @echo    Script de remocao softwares de fabrica.
@@ -514,7 +483,7 @@ powershell -Command "Get-AppxPackage Microsoft.549981C3F5F10 | Remove-AppxPackag
 powershell -Command "Get-AppxPackage Microsoft.OneDrive | Remove-AppxPackage"
 powershell -Command "Get-AppxPackage MicrosoftTeams | Remove-AppxPackage"
 
-set appsToUninstall=(
+for %%a in (
     "Microsoft.3DBuilder",
     "Microsoft.BingWeather",
     "Microsoft.GetHelp",
@@ -538,7 +507,7 @@ set appsToUninstall=(
     "Microsoft.XboxIdentityProvider",
     "Microsoft.XboxSpeechToTextOverlay",
     "Microsoft.YourPhone"
-)
+) do 
 
 for %%a in %appsToUninstall% do (
     powershell -Command "Get-AppxPackage -Name %%a -AllUsers | Remove-AppxPackage"
@@ -551,7 +520,6 @@ goto menu
 
 :parte7
 echo Executando a Parte 7...
-@echo off
 @echo ============================================================================
 @echo    Script de instalação de softwares básicos clientes
 @echo ============================================================================
@@ -561,8 +529,6 @@ choco install winrar --yes
 choco install wps-office-free --version=11.2.0.9684 --yes
 choco install brave --yes
 
-choco uninstall chocolatey --yes
-echo Chocolatey desinstalado com sucesso
 pause
 goto menu
 
