@@ -161,7 +161,7 @@ choco -v >nul 2>&1
 if %errorlevel% neq 0 (
     powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
 )
-msg %username% Chocolatey Instalado com Sucesso.
+msg %username% Chocolatey Instalado com Sucesso!
 goto menu
 
 :parte6
